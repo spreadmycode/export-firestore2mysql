@@ -1,0 +1,23 @@
+{
+  "name": "export-scripts",
+  "version": "1.0.0",
+  "description": "Export Script from Firestore to MySQL",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "http": "0.0.1-security",
+    "mysql": "^2.18.1",
+    "request": "^2.88.2",
+    "socket.io": "^4.3.2",
+    "firebase": "^9.6.8"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15",
+    "shelljs": "^0.8.4",
+    "firebase-admin": "^10.0.1"
+  }
+}
