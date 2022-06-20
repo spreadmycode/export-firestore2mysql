@@ -2,7 +2,7 @@ import { getApps, initializeApp } from "firebase/app";
 import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
-import { execQuery } from "./db";
+const syncSql = require("sync-sql");
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_apiKey,
@@ -31,23 +31,86 @@ const firebase = initFirebase();
 const exportDatabase = async () => {
   if (!firebase) return;
 
-  const snapshot = await getDocs(collection(firebase.db, "activity"));
-  const docs = snapshot.docs;
-  docs.forEach((doc, index) => {
+  console.log(
+    "################################ activity ################################"
+  );
+  const activitysnapshot = await getDocs(collection(firebase.db, "activity"));
+  let activitydocs = activitysnapshot.docs;
+  console.log(`Items ${activitydocs.length}`);
+  activitydocs.forEach((doc) => {
     const data = {
       content: doc.data()?.content,
       date: doc.data()?.date,
       score: doc.data()?.score,
       userId: doc.data()?.userId,
     };
-    var query = "INSERT INTO activity SET ?";
-    execQuery(query, data, (error: any, res: any) => {
-      if (error) {
-        console.log(`Error ${index}:`, error);
-        return;
-      }
-      console.log(`Success ${index}`);
-    });
+    var sql = `INSERT INTO activity (userId, content, score, date) VALUES('${data.userId}', '${data.content}', ${data.score}, '${data.date}')`;
+    syncSql.mysql(
+      {
+        host: "localhost",
+        user: "root",
+        password: "",
+        database: "meemosworld",
+        port: "3306",
+      },
+      sql
+    );
+  });
+
+  console.log(
+    "################################ moodfeelings ################################"
+  );
+  const moodfeelingssnapshot = await getDocs(
+    collection(firebase.db, "moodfeelings")
+  );
+  const moodfeelingsdocs = moodfeelingssnapshot.docs;
+  console.log(`Items ${moodfeelingsdocs.length}`);
+  moodfeelingsdocs.forEach((doc) => {
+    const data = {
+      lastModifiedDate: doc.data()?.lastModifiedDate,
+      moodId: doc.data()?.moodId,
+      point: doc.data()?.point,
+      userId: doc.data()?.userId,
+    };
+    var sql = `INSERT INTO moodfeelings (userId, lastModifiedDate, moodId, point) VALUES('${data.userId}', '${data.lastModifiedDate}', '${data.moodId}', ${data.point})`;
+    syncSql.mysql(
+      {
+        host: "localhost",
+        user: "root",
+        password: "",
+        database: "meemosworld",
+        port: "3306",
+      },
+      sql
+    );
+  });
+
+  console.log(
+    "################################ userHistories ################################"
+  );
+  const userHistoriessnapshot = await getDocs(
+    collection(firebase.db, "userHistories")
+  );
+  const userHistoriesdocs = userHistoriessnapshot.docs;
+  console.log(`Items ${userHistoriesdocs.length}`);
+  userHistoriesdocs.forEach((doc) => {
+    const data = {
+      lastModifiedDate: doc.data()?.lastModifiedDate,
+      action: doc.data()?.action,
+      time: doc.data()?.time,
+      userId: doc.data()?.userId,
+    };
+    var sql = `INSERT INTO userHistories (userId, action, time) VALUES('${data.userId}', ${data.action}, '${data.time}')`;
+    syncSql.mysql(
+      {
+        host: "localhost",
+        user: "root",
+        password: "",
+        database: "meemosworld",
+        port: "3306",
+      },
+      sql
+    );
   });
 };
 
